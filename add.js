@@ -94,6 +94,20 @@ var main = function(deps, install) {
 	
 	if (raw) {
 		deps.forEach(function (pck) {
+			var wc = pck[pck.length-1] === "*";
+			var ver;
+
+			if (wc) {
+				pck = pck.slice(0, pck.length-1);
+			} else {
+				var lI = pck.lastIndexOf("v");
+				var sx = pck.slice(lI + 1);
+
+				if (svr.test(sx)) {
+					ver = sve(sx);
+					pck = pck.slice(0, lI)
+				}
+			}
 			package.dependencies[pck] = wc ? "*" : ver;
 			log("» Adding: ", pck + " v" + package.dependencies[pck])
 			return _next();
