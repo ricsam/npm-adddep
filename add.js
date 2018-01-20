@@ -88,7 +88,7 @@ var main = function(deps, install) {
 		var _next = function () {
 			if ( ++i !== deps.length ) return;
 
-			fs.writeFileSync(base + '/package.json', JSON.stringify(package, null, "\t"));
+			fs.writeFileSync(base + '/package.json', JSON.stringify(package, true, 2));
 			log("\n» Updated package.json\n");
 		}
 
@@ -224,7 +224,7 @@ if (require.main === module) {
 
 					package.version = ver;
 
-					fs.writeFileSync(base + '/package.json', JSON.stringify(package, null, "\t"));
+					fs.writeFileSync(base + '/package.json', JSON.stringify(package, true, 2));
 					log("\n» Updated package.json");
 
 					return process.reallyExit();
