@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var npm = require('npm');
+var raw = false;
 
 var self = require("./package.json");
 
@@ -81,16 +82,26 @@ var main = function(deps, install) {
 	} catch(e) {
 		exit("Inexistent or malformed package.json.");
 	}
+	
+	var i = 0;
 
+	var _next = function () {
+		if ( ++i !== deps.length ) return;
+
+		fs.writeFileSync(base + '/package.json', JSON.stringify(package, true, 2));
+		log("\n» Updated package.json\n");
+	}
+	
+	if (raw) {
+		deps.forEach(function (pck) {
+			package.dependencies[pck] = wc ? "*" : ver;
+			log("» Adding: ", pck + " v" + package.dependencies[pck])
+			return _next();
+		});
+		return;
+	}
 	npm.load({}, function(err) {
-		var i = 0;
 
-		var _next = function () {
-			if ( ++i !== deps.length ) return;
-
-			fs.writeFileSync(base + '/package.json', JSON.stringify(package, true, 2));
-			log("\n» Updated package.json\n");
-		}
 
 		deps.forEach(function (pck) {
 			// wildcard: version will be *
@@ -197,6 +208,9 @@ if (require.main === module) {
 
 		if ( ~xo.indexOf("-i") || ~xo.indexOf("--install") ) {
 			install = true;
+		}
+		if ( ~xo.indexOf("-r") || ~xo.indexOf("--raw") ) {
+			raw = true;
 		}
 
 		if ( xo[0] === "-b" || xo[0] === "-bump" ) {
